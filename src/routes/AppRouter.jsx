@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router'
-import Home from '../app/home/home'
+import Home from '../app/home/Home'
 import Pokedex from '../app/pokedex/Pokedex'
 import Pokemon from '../app/pokemon/Pokemon'
 
