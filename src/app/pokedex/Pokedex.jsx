@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useName } from '../../hooks/useName'
 import axios from 'axios'
 import PokemonList from './components/PokemonList'
-
+import { Link } from 'react-router'
 
 const POKEAPI_BASE = 'https://pokeapi.co/api/v2'
 
@@ -67,7 +67,7 @@ function Pokedex() {
       })
   }, [selectType])
 
-  
+
   const searchPokemon = () => {
     if (!search) {
       getInitialPokemons()
@@ -95,33 +95,38 @@ function Pokedex() {
   return (
     <div>
       <h1>Pokedex</h1>
-      {name && <p>Bienvenido {name}, aqui podrás encontrar a tu pokemon favorito</p>}
+      {name && <div>
+        <p>Bienvenido {name}, aqui podrás encontrar a tu pokemon favorito</p>
+        </div>
+        }
+
       <input
         type='text'
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder='filter or search by name or id'
+        onKeyDown={() => e.key === 'Enter' && searchPokemon()}
       />
-      <button>Search</button>
+      <button onClick={searchPokemon}>Search</button>
       <select
         value={selectType}
-        onChange={(e) => setSelectedType(e.target.value)}
-      >
+        onChange={(e) => setSelectedType(e.target.value)}>
         <option value="all">all</option>
         {types.map(type => (
-          <option key={type.name} value={type.name}>{type.name}
+          <option key={type.name} value={type.name}>
+            {type.name}
           </option>
         ))}
       </select>
 
-      {singlePokemon &&
-        <div>
+      {singlePokemon ?
+        <Link to={`/pokedex/${singlePokemon.name}`}>
           <h2>{singlePokemon?.name}</h2>
           <img src={singlePokemon?.sprites?.font_default} alt={singlePokemon.name} />
-        </div>
-      }
-
+        </Link>
+        :
       <PokemonList pokemons={fitleredPokemons} />
+      }
     </div>
   )
 }
