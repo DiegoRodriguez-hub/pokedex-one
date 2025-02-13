@@ -3,6 +3,7 @@ import { useName } from '../../hooks/useName'
 import axios from 'axios'
 import PokemonList from './components/PokemonList'
 
+
 const POKEAPI_BASE = 'https://pokeapi.co/api/v2'
 
 function Pokedex() {
@@ -13,7 +14,7 @@ function Pokedex() {
   const [types, setTypes] = useState([])
   const [singlePokemon, setSinglePokemon] = useState(null)
 
-  const { name } = useName()
+  const { name, clearName } = useName()
 
   //funcion para cargar primeros 20 pokemones
   const getInitialPokemons = () => {
@@ -22,6 +23,7 @@ function Pokedex() {
     .then(({ data }) => {
       setPokemons(data.results)
       setFilteredPokemons(data.results)
+      setSinglePokemon(null)
     })  
   }
 
@@ -32,21 +34,21 @@ function Pokedex() {
   //cargar los tipos de pokémon
   useEffect(() => {
     axios.get(`${POKEAPI_BASE}/type?limit=18`)
-    .then(({ data }) => setTypes(data.results))
+      .then(({ data }) => setTypes(data.results))
   }, [])
 
   //filtrar en tiempo real mientras se escribe en el input
   useEffect(() => {
     if (!search) {
       setFilteredPokemons(pokemons)
+      setSinglePokemon(null)
       return
     }
 
     setFilteredPokemons(
       pokemons.filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase())
-      )
-    )
+      ))
   }, [search, pokemons])
 
   //cargar pokemon segun el tipo seleccionado
@@ -61,9 +63,11 @@ function Pokedex() {
         const typePokemons = data.pokemon.map(p => p.pokemon)
         setPokemons(typePokemons)
         setFilteredPokemons(typePokemons)
+        setSinglePokemon(null)
       })
   }, [selectType])
 
+  
   const searchPokemon = () => {
     if (!search) {
       getInitialPokemons()
@@ -75,15 +79,16 @@ function Pokedex() {
         if (selectType !== 'all') {
           const isOfType = data.types.some(t => t.type.name === selectType)
           if (!isOfType) {
+            setSinglePokemon(null)
             alert('El pokemon no es del tipo seleccionado')
             return
           }
         }
-        console.log(fitleredPokemons)
         setSinglePokemon(data)
       })
       .catch(() => {
         alert('Pokemón no encontrado')
+        setSinglePokemon(null)
       })
   }
 
